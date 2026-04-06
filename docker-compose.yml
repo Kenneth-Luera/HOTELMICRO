@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+
+  mysql:
+    image: mysql:8
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hotel_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  auth_service:
+    build: ./auth_service
+    command: python manage.py runserver 0.0.0.0:8001
+    volumes:
+      - ./auth_service:/app
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mysql
+
+  hotel_service:
+    build: ./hotel_service
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./hotel_service:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+
+  booking_service:
+    build: ./booking_service
+    command: python manage.py runserver 0.0.0.0:8002
+    volumes:
+      - ./booking_service:/app
+    ports:
+      - "8002:8002"
+    depends_on:
+      - mysql
+
+  chat_service:
+    build: ./chat_service
+    command: daphne -b 0.0.0.0 -p 8004 chat_service.asgi:application
+    volumes:
+      - ./chat_service:/app
+    ports:
+      - "8004:8004"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:

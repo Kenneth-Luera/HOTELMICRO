@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
 
   mysql:
@@ -13,46 +11,94 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hotel_net
 
   auth_service:
-    build: ./auth_service
+    image: hotel-platform_auth_service:latest
     command: python manage.py runserver 0.0.0.0:8001
     volumes:
       - ./auth_service:/app
     ports:
       - "8001:8001"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: hotel_db
+      DB_USER: root
+      DB_PASSWORD: root
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+    networks:
+      - hotel_net
 
   hotel_service:
-    build: ./hotel_service
+    image: hotel-platform_hotel_service:latest
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./hotel_service:/app
     ports:
       - "8000:8000"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: hotel_db
+      DB_USER: root
+      DB_PASSWORD: root
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+    networks:
+      - hotel_net
 
   booking_service:
-    build: ./booking_service
+    image: hotel-platform_booking_service:latest
     command: python manage.py runserver 0.0.0.0:8002
     volumes:
       - ./booking_service:/app
     ports:
       - "8002:8002"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: hotel_db
+      DB_USER: root
+      DB_PASSWORD: root
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+    networks:
+      - hotel_net
 
   chat_service:
-    build: ./chat_service
+    image: hotel-platform_chat_service:latest
     command: daphne -b 0.0.0.0 -p 8004 chat_service.asgi:application
-    volumes:
-      - ./chat_service:/app
+    #volumes:
+    # - ./chat_service:/app
     ports:
       - "8004:8004"
+    environment:
+      DJANGO_SETTINGS_MODULE: chat_service.settings
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: hotel_db
+      DB_USER: root
+      DB_PASSWORD: root
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+    networks:
+      - hotel_net
 
 volumes:
   mysql_data:
+
+networks:
+  hotel_net:
+    driver: bridge

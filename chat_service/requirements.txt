@@ -1,4 +1,7 @@
 channels
 daphne
 mysqlclient
+requests
+djangorestframework
+django
 python-dotenv

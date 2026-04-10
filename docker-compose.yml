@@ -4,15 +4,17 @@ services:
     image: mysql:8
     container_name: mysql_db
     restart: always
+    env_file:
+      - .env
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: hotel_db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
     ports:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,14 +26,18 @@ services:
     command: python manage.py runserver 0.0.0.0:8001
     volumes:
       - ./auth_service:/app
-    ports:
-      - "8001:8001"
+    expose:
+      - "8001"
+    env_file:
+      - .env
     environment:
+      DJANGO_SETTINGS_MODULE: config.settings
+      SECRET_KEY: ${DJANGO_SECRET_KEY}
       DB_HOST: mysql
-      DB_PORT: 3306
-      DB_NAME: hotel_db
-      DB_USER: root
-      DB_PASSWORD: root
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     depends_on:
       mysql:
         condition: service_healthy
@@ -43,14 +49,18 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./hotel_service:/app
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
+    env_file:
+      - .env
     environment:
+      DJANGO_SETTINGS_MODULE: config.settings
+      SECRET_KEY: ${DJANGO_SECRET_KEY}
       DB_HOST: mysql
-      DB_PORT: 3306
-      DB_NAME: hotel_db
-      DB_USER: root
-      DB_PASSWORD: root
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     depends_on:
       mysql:
         condition: service_healthy
@@ -62,14 +72,18 @@ services:
     command: python manage.py runserver 0.0.0.0:8002
     volumes:
       - ./booking_service:/app
-    ports:
-      - "8002:8002"
+    expose:
+      - "8002"
+    env_file:
+      - .env
     environment:
+      DJANGO_SETTINGS_MODULE: config.settings
+      SECRET_KEY: ${DJANGO_SECRET_KEY}
       DB_HOST: mysql
-      DB_PORT: 3306
-      DB_NAME: hotel_db
-      DB_USER: root
-      DB_PASSWORD: root
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     depends_on:
       mysql:
         condition: service_healthy
@@ -79,20 +93,54 @@ services:
   chat_service:
     image: hotel-platform_chat_service:latest
     command: daphne -b 0.0.0.0 -p 8004 chat_service.asgi:application
-    #volumes:
-    # - ./chat_service:/app
-    ports:
-      - "8004:8004"
+    expose:
+      - "8004"
+    env_file:
+      - .env
     environment:
       DJANGO_SETTINGS_MODULE: chat_service.settings
+      SECRET_KEY: ${DJANGO_SECRET_KEY}
       DB_HOST: mysql
-      DB_PORT: 3306
-      DB_NAME: hotel_db
-      DB_USER: root
-      DB_PASSWORD: root
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     depends_on:
       mysql:
         condition: service_healthy
+    networks:
+      - hotel_net
+
+  api_gateway:
+    image: hotel-platform_api_gateway:latest
+    command: python manage.py runserver 0.0.0.0:8080
+    volumes:
+      - ./gateway:/app
+    expose:
+      - "8080"
+    env_file:
+      - .env
+    environment:
+      DJANGO_SETTINGS_MODULE: gateway.settings
+      SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DEBUG: ${DJANGO_DEBUG}
+    depends_on:
+      - auth_service
+      - hotel_service
+      - booking_service
+      - chat_service
+    networks:
+      - hotel_net
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"     # ← único punto de entrada
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - api_gateway
+      - chat_service
     networks:
       - hotel_net
 

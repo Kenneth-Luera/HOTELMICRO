@@ -11,7 +11,6 @@ def forward_request(service_name: str, path: str, request, pk=None) -> httpx.Res
     if not base_url:
         raise ValueError(f"Servicio '{service_name}' no registrado.")
 
-    # Si viene un pk lo agregamos al path
     if pk:
         url = f"{base_url}/{path}{pk}/"
     else:

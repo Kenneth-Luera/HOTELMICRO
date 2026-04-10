@@ -2,7 +2,7 @@ from django.urls import re_path
 from .views import GatewayView, PublicGatewayView
 
 urlpatterns = [
-    # ── Auth (públicas) ────────────────────────────────────
+    # ── Auth (publicas) ────────────────────────────────────
     re_path(r'^api/auth/register/$',
             PublicGatewayView.as_view(), {'service_name': 'auth', 'path': 'api/register/'}),
     re_path(r'^api/auth/login/$',

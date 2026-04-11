@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'drf_spectacular',
     'rest_framework',
     'users',
     'django.contrib.admin',
@@ -76,6 +77,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
@@ -84,6 +86,12 @@ SIMPLE_JWT = {
 }
 
 WSGI_APPLICATION = 'config.wsgi.application'
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Auth Service API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 
 # Database

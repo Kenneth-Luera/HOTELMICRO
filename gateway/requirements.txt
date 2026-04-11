@@ -3,3 +3,5 @@ djangorestframework
 djangorestframework-simplejwt
 httpx
 python-decouple
+drf-spectacular
+requests

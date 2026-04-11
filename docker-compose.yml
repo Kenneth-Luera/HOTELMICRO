@@ -22,7 +22,9 @@ services:
       - hotel_net
 
   auth_service:
-    image: hotel-platform_auth_service:latest
+    build:
+      context: ./auth_service
+      dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8001
     volumes:
       - ./auth_service:/app
@@ -45,7 +47,9 @@ services:
       - hotel_net
 
   hotel_service:
-    image: hotel-platform_hotel_service:latest
+    build:
+      context: ./hotel_service
+      dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./hotel_service:/app
@@ -68,7 +72,9 @@ services:
       - hotel_net
 
   booking_service:
-    image: hotel-platform_booking_service:latest
+    build:
+      context: ./booking_service
+      dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8002
     volumes:
       - ./booking_service:/app
@@ -91,7 +97,9 @@ services:
       - hotel_net
 
   chat_service:
-    image: hotel-platform_chat_service:latest
+    build:
+      context: ./chat_service
+      dockerfile: Dockerfile
     command: daphne -b 0.0.0.0 -p 8004 chat_service.asgi:application
     expose:
       - "8004"
@@ -112,7 +120,9 @@ services:
       - hotel_net
 
   api_gateway:
-    image: hotel-platform_api_gateway:latest
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8080
     volumes:
       - ./gateway:/app

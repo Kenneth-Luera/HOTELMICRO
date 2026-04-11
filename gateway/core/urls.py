@@ -1,5 +1,7 @@
 from django.urls import re_path
 from .views import GatewayView, PublicGatewayView
+from django.views.generic import TemplateView
+from .schema import UnifiedSchemaView
 
 urlpatterns = [
     # ── Auth (publicas) ────────────────────────────────────
@@ -27,4 +29,10 @@ urlpatterns = [
             GatewayView.as_view(), {'service_name': 'booking', 'path': 'bookings/'}),
     re_path(r'^api/bookings/(?P<pk>[^/]+)/$',
             GatewayView.as_view(), {'service_name': 'booking', 'path': 'bookings/'}),
+
+    # swagger
+    re_path(r'^api/docs/$',
+            TemplateView.as_view(template_name='swagger.html'), name='swagger-ui'),
+    re_path(r'^api/docs/schema/$',
+            UnifiedSchemaView.as_view(), name='unified-schema'),
 ]

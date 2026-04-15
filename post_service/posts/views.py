@@ -1,7 +1,9 @@
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
+
 from .models import Post, PostImage
 from .serializers import PostSerializer
-from rest_framework.permissions import IsAuthenticated
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -12,7 +14,6 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-
         role = self.request.query_params.get('role')
 
         if role:
@@ -21,11 +22,11 @@ class PostViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        token = self.request.auth
+        user = self.request.user
 
         post = serializer.save(
-            user_id=token.get("user_id"),
-            role=token.get("role")
+            user_id=user.id,
+            role=user.role
         )
 
         images = self.request.FILES.getlist('images')
@@ -34,17 +35,17 @@ class PostViewSet(viewsets.ModelViewSet):
             PostImage.objects.create(post=post, image=image)
 
     def perform_update(self, serializer):
-        token = self.request.auth
+        user = self.request.user
 
-        if str(serializer.instance.user_id) != str(token.get("user_id")):
-            raise PermissionError("No puedes editar este post")
+        if str(serializer.instance.user_id) != str(user.id):
+            raise PermissionDenied("No puedes editar este post")
 
         serializer.save()
 
     def perform_destroy(self, instance):
-        token = self.request.auth
+        user = self.request.user
 
-        if str(instance.user_id) != str(token.get("user_id")):
-            raise PermissionError("No puedes eliminar este post")
+        if str(instance.user_id) != str(user.id):
+            raise PermissionDenied("No puedes eliminar este post")
 
         instance.delete()

@@ -76,8 +76,10 @@ TEMPLATES = [
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'posts.authentication.CustomJWTAuthentication',
+    ),
 }
-
 WSGI_APPLICATION = 'post_service.wsgi.application'
 
 
@@ -94,6 +96,7 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+
 
 
 MEDIA_URL = '/media/'

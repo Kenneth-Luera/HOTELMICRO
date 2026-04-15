@@ -15,9 +15,11 @@ from django.shortcuts import get_object_or_404
 class HotelViewSet(viewsets.ModelViewSet):
     queryset = Hotel.objects.all()
     serializer_class = HotelSerializer
-    permission_classes = [IsAuthenticated, IsHotelOwner]
 
     def get_queryset(self):
+        if self.action == 'public_hotels':
+            return Hotel.objects.all()
+
         if not self.request.auth:
             return Hotel.objects.none()
 
@@ -28,12 +30,20 @@ class HotelViewSet(viewsets.ModelViewSet):
         if not self.request.auth:
             raise Exception("No autenticado")
 
-        try:
-            user_id = self.request.auth['user_id']
-        except Exception:
-            raise Exception("Token inválido")
-
+        user_id = self.request.auth['user_id']
         serializer.save(owner_id=user_id)
+
+    @action(detail=False, methods=['get'], url_path='public')
+    def public_hotels(self, request):
+        hotels = Hotel.objects.all()
+        serializer = self.get_serializer(hotels, many=True)
+        return Response(serializer.data)
+
+    def get_permissions(self):
+        if self.action == 'public_hotels':
+            return [AllowAny()]
+
+        return [IsAuthenticated(), IsHotelOwner()]
 
 class RoomViewSet(viewsets.ModelViewSet):
 

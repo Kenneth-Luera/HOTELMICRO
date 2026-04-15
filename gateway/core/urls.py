@@ -11,6 +11,8 @@ urlpatterns = [
             PublicGatewayView.as_view(), {'service_name': 'auth', 'path': 'api/login/'}),
     re_path(r'^api/auth/refresh/$',
             PublicGatewayView.as_view(), {'service_name': 'auth', 'path': 'api/refresh/'}),
+    re_path(r'^api/users/$',
+            GatewayView.as_view(),{'service_name': 'auth', 'path': 'api/users/'}),
 
     # ── Hotels (protegidas) ────────────────────────────────
     re_path(r'^api/hotels/$',

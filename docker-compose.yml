@@ -28,8 +28,8 @@ services:
     command: python manage.py runserver 0.0.0.0:8001
     volumes:
       - ./auth_service:/app
-    expose:
-      - "8001"
+    ports:
+      - "8001:8001"
     env_file:
       - .env
     environment:

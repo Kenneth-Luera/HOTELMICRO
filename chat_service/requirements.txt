@@ -5,3 +5,4 @@ requests
 djangorestframework
 django
 python-dotenv
+djangorestframework-simplejwt

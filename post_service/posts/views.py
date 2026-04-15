@@ -10,7 +10,6 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
 
-    # 🔍 Filtrar por rol (para frontend: hotel / user)
     def get_queryset(self):
         queryset = super().get_queryset()
 
@@ -21,7 +20,6 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    # 🔥 Crear post + imágenes
     def perform_create(self, serializer):
         token = self.request.auth
 
@@ -30,13 +28,11 @@ class PostViewSet(viewsets.ModelViewSet):
             role=token.get("role")
         )
 
-        # 📸 múltiples imágenes
         images = self.request.FILES.getlist('images')
 
         for image in images:
             PostImage.objects.create(post=post, image=image)
 
-    # 🔥 (opcional) evitar que otros editen posts que no son suyos
     def perform_update(self, serializer):
         token = self.request.auth
 

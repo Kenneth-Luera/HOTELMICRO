@@ -61,6 +61,12 @@ class UnifiedSchemaView(APIView):
             "prefix": "/api",
             "strip": "",
         },
+        {
+            "name": "posts",
+            "schema_url": f"{settings.MICROSERVICES['posts']}/api/schema/?format=json",
+            "prefix": "/api",
+            "strip": "/api",
+        },
     ]
 
     def get(self, request):

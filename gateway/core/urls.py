@@ -35,4 +35,10 @@ urlpatterns = [
             TemplateView.as_view(template_name='swagger.html'), name='swagger-ui'),
     re_path(r'^api/docs/schema/$',
             UnifiedSchemaView.as_view(), name='unified-schema'),
+    # ── Posts (protegidas) ───────────────────────────────
+    re_path(r'^api/posts/$',
+            GatewayView.as_view(), {'service_name': 'posts', 'path': 'api/posts/'}),
+
+    re_path(r'^api/posts/(?P<pk>[^/]+)/$',
+            GatewayView.as_view(), {'service_name': 'posts', 'path': 'api/posts/'}),
 ]

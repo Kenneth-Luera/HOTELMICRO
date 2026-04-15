@@ -119,6 +119,31 @@ services:
     networks:
       - hotel_net
 
+  post_service:
+    build:
+      context: ./post_service
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8003
+    volumes:
+      - ./post_service:/app
+    expose:
+      - "8003"
+    env_file:
+      - .env
+    environment:
+      DJANGO_SETTINGS_MODULE: post_service.settings
+      SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DB_HOST: mysql
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - hotel_net
+
   api_gateway:
     build:
       context: ./gateway

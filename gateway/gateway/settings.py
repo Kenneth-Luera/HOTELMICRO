@@ -61,9 +61,10 @@ SIMPLE_JWT = {
 # ── Microservicios ─────────────────────────────────────────
 # Nombres de host = nombres de servicio en docker-compose
 MICROSERVICES = {
-    'auth':    'http://auth_service:8001',
     'hotels':  'http://hotel_service:8000',
+    'auth':    'http://auth_service:8001',
     'booking': 'http://booking_service:8002',
+    'posts':   'http://post_service:8003',
     'chat':    'http://chat_service:8004',
 }
 

@@ -12,34 +12,32 @@ class JWTAuthMiddleware(BaseMiddleware):
         params = parse_qs(query_string)
         token_list = params.get("token", [])
 
-        print("🔍 query_string:", query_string)
-        print("🔍 token_list:", token_list)
+        print("query_string:", query_string)
+        print("token_list:", token_list)
 
         if token_list:
             token = token_list[0]
             user_data = await self.get_user_from_token(token)
-            print("✅ user_data:", user_data)
+            print("user_data:", user_data)
             scope["user"] = user_data
         else:
             scope["user"] = None
-            print("❌ No token encontrado")
+            print("No token encontrado")
 
         return await super().__call__(scope, receive, send)
 
     @database_sync_to_async
     def get_user_from_token(self, token):
         try:
-            # ✅ Valida con SimpleJWT
             UntypedToken(token)
 
-            # ✅ Decodifica sin verificar de nuevo (ya validado arriba)
             decoded = jwt.decode(
                 token,
                 settings.SECRET_KEY,
                 algorithms=["HS256"]
             )
 
-            print("🧩 decoded payload:", decoded)
+            print("decoded payload:", decoded)
 
             return {
                 "user_id": decoded.get("user_id"),
@@ -47,5 +45,5 @@ class JWTAuthMiddleware(BaseMiddleware):
                 "is_authenticated": True
             }
         except (InvalidToken, TokenError) as e:
-            print("❌ Token inválido:", e)
+            print("Token inválido:", e)
             return {"is_authenticated": False, "error": str(e)}

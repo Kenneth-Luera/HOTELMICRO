@@ -61,13 +61,12 @@ SIMPLE_JWT = {
 # ── Microservicios ─────────────────────────────────────────
 # Nombres de host = nombres de servicio en docker-compose
 MICROSERVICES = {
-    'hotels':  'http://hotel_service:8000',
-    'auth':    'http://auth_service:8001',
-    'booking': 'http://booking_service:8002',
-    'posts':   'http://post_service:8003',
-    'chat':    'http://chat_service:8004',
+    'hotels':  'http://hotel-service:8000',
+    'auth':    'http://auth-service:8001',
+    'booking': 'http://booking-service:8002',
+    'posts':   'http://post-service:8003',
+    'chat':    'http://chat-service:8004',
 }
-
 # ── Internacionalización ───────────────────────────────────
 LANGUAGE_CODE = 'es-pe'
 TIME_ZONE = 'America/Lima'

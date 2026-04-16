@@ -1,6 +1,6 @@
 import requests
 
-HOTEL_SERVICE_URL = "http://127.0.0.1:8001/api/rooms/"
+HOTEL_SERVICE_URL = "http://hotel-service:8000/api/rooms/"
 
 def get_room(room_id):
 

@@ -31,8 +31,6 @@ class CustomTokenSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-
-        # 🔥 esto va dentro del JWT
         token['user_id'] = str(user.id)
         token['role'] = user.role
 

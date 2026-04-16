@@ -21,7 +21,6 @@ class BookingViewSet(viewsets.ModelViewSet):
         check_in = serializer.validated_data.get('check_in')
         check_out = serializer.validated_data.get('check_out')
 
-        # 🔥 VALIDAR DISPONIBILIDAD
         overlapping = Booking.objects.filter(
             room_id=room_id,
             check_in__lt=check_out,
@@ -31,7 +30,6 @@ class BookingViewSet(viewsets.ModelViewSet):
         if overlapping:
             raise ValidationError("La habitación no está disponible en esas fechas")
 
-        # 🔥 OBTENER ROOM REAL
         room = get_room(room_id)
 
         if not room:
@@ -39,7 +37,6 @@ class BookingViewSet(viewsets.ModelViewSet):
 
         price_per_night = float(room['price_per_night'])
 
-        # 🔥 CALCULAR TOTAL
         days = (check_out - check_in).days
         total = days * price_per_night
 

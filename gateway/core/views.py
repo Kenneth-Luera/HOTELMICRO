@@ -30,6 +30,18 @@ class GatewayView(APIView):
                 status=404,
                 content_type='application/json'
             )
+        except ConnectionError as e:
+            return HttpResponse(
+                json.dumps({'error': 'Servicio no disponible', 'detail': str(e)}),
+                status=503,
+                content_type='application/json'
+            )
+        except TimeoutError as e:
+            return HttpResponse(
+                json.dumps({'error': 'Servicio tardó demasiado', 'detail': str(e)}),
+                status=504,
+                content_type='application/json'
+            )
         except Exception as e:
             return HttpResponse(
                 json.dumps({'error': 'Gateway error', 'detail': str(e)}),
